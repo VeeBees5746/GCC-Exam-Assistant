@@ -47,6 +47,13 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    #wakeMessage {
+      color: green;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -54,9 +61,16 @@
 
   <div id="startContainer">
     <button id="startBtn" onclick="startListening()">▶️ Start Listening</button>
+    <div id="wakeMessage">🔋 Screen will be kept awake during playback.</div>
   </div>
 
   <div id="toc" style="display: none;"></div>
+
+  <div class="floating-controls" id="floatingControls" style="display: none;">
+    <button onclick="prevAudio()">⬅️</button>
+    <button id="playPauseBtn" onclick="togglePlayPause()">⏸️</button>
+    <button onclick="nextAudio()">➡️</button>
+  </div>
 
   <audio id="player"></audio>
 
@@ -197,9 +211,12 @@
     const tocContainer = document.getElementById('toc');
     const player = document.getElementById('player');
     const startContainer = document.getElementById('startContainer');
+    const floatingControls = document.getElementById('floatingControls');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const wakeMessage = document.getElementById('wakeMessage');
 
     let currentTrack = 0;
-    let floatingControls = null;
+    let wakeLock = null;
 
     tocData.forEach((entry, i) => {
       const div = document.createElement('div');
@@ -211,22 +228,10 @@
 
     const lines = document.querySelectorAll('.line');
 
-    function insertControls(index) {
-      // Remove existing controls
-      if (floatingControls && floatingControls.parentNode) {
-        floatingControls.parentNode.removeChild(floatingControls);
-      }
-
-      // Create new control bar
-      floatingControls = document.createElement('div');
-      floatingControls.className = 'floating-controls';
-      floatingControls.innerHTML = `
-        <button onclick="prevAudio()">⬅️</button>
-        <button onclick="togglePlayPause()" id="playPauseBtn">⏸️</button>
-        <button onclick="nextAudio()">➡️</button>
-      `;
-
-      lines[index].after(floatingControls);
+    function moveControls(index) {
+      const line = document.getElementById(`line${index}`);
+      line.insertAdjacentElement("afterend", floatingControls);
+      floatingControls.style.display = "flex";
     }
 
     function highlightLine(index) {
@@ -234,7 +239,7 @@
         line.classList.toggle('active', i === index);
         if (i === index) {
           line.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          insertControls(i);
+          moveControls(i);
         }
       });
     }
@@ -244,7 +249,7 @@
       player.src = tocData[index].audio;
       highlightLine(index);
       player.play();
-      document.getElementById('playPauseBtn').innerText = '⏸️';
+      playPauseBtn.innerText = '⏸️';
     }
 
     function nextAudio() {
@@ -262,10 +267,10 @@
     function togglePlayPause() {
       if (player.paused) {
         player.play();
-        document.getElementById('playPauseBtn').innerText = '⏸️';
+        playPauseBtn.innerText = '⏸️';
       } else {
         player.pause();
-        document.getElementById('playPauseBtn').innerText = '▶️';
+        playPauseBtn.innerText = '▶️';
       }
     }
 
@@ -275,12 +280,23 @@
       playTrack(currentTrack);
     });
 
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeMessage.style.display = 'block';
+        }
+      } catch (err) {
+        console.error(`Wake lock error: ${err.name}, ${err.message}`);
+      }
+    }
+
     function startListening() {
       startContainer.style.display = 'none';
       tocContainer.style.display = 'block';
       playTrack(currentTrack);
+      requestWakeLock();
     }
   </script>
 </body>
 </html>
-
