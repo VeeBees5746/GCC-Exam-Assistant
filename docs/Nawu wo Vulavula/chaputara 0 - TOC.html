@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHSA TOC Chapter 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      line-height: 1.7;
+      scroll-behavior: smooth;
+    }
+    .line {
+      padding: 10px;
+      border-left: 4px solid transparent;
+    }
+    .active {
+      background-color: #fff4f4;
+      color: #d60000;
+      border-left: 4px solid #d60000;
+      font-weight: bold;
+    }
+    .controls {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+    }
+    button {
+      background-color: #0073ea;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>MINE HEALTH AND SAFETY ACT 29 OF 1996 – TOC: CHAPTER 1</h2>
+  <div id="toc">
+    <div class="line" id="line0">1. MINE HEALTH AND SAFETY ACT 29 OF 1996</div>
+    <div class="line" id="line1">CHAPTER 1 – OBJECTS OF ACT</div>
+    <div class="line" id="line2">1. Objects of Act</div>
+  </div>
+
+  <div class="controls">
+    <button onclick="prevAudio()">⬅️ Previous</button>
+    <button id="playPauseBtn" onclick="togglePlayPause()">⏸️ Pause</button>
+    <button onclick="nextAudio()">➡️ Next</button>
+  </div>
+
+  <audio id="player"></audio>
+
+  <script>
+    const lines = document.querySelectorAll('.line');
+    const player = document.getElementById('player');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+
+    const audioTracks = [
+      "https://static.wixstatic.com/mp3/32bb59_f8f2ababd88f491aa6049db43f28d2f8.mp3",
+      "https://static.wixstatic.com/mp3/32bb59_c4b414a3a8274a6280a5470fe5fda16d.mp3",
+      "https://static.wixstatic.com/mp3/32bb59_facff908430d4182ace3d1d5c6dadda4.mp3"
+    ];
+
+    let currentTrack = 0;
+
+    function highlightLine(index) {
+      lines.forEach((line, i) => {
+        line.classList.toggle('active', i === index);
+        if (i === index) {
+          line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
+
+    function playTrack(index) {
+      currentTrack = index;
+      player.src = audioTracks[index];
+      highlightLine(index);
+      player.play();
+      playPauseBtn.innerText = '⏸️ Pause';
+    }
+
+    function nextAudio() {
+      currentTrack++;
+      if (currentTrack >= audioTracks.length) {
+        currentTrack = 0; // restart if at end
+      }
+      playTrack(currentTrack);
+    }
+
+    function prevAudio() {
+      currentTrack--;
+      if (currentTrack < 0) {
+        currentTrack = audioTracks.length - 1;
+      }
+      playTrack(currentTrack);
+    }
+
+    function togglePlayPause() {
+      if (player.paused) {
+        player.play();
+        playPauseBtn.innerText = '⏸️ Pause';
+      } else {
+        player.pause();
+        playPauseBtn.innerText = '▶️ Play';
+      }
+    }
+
+    player.addEventListener('ended', () => {
+      currentTrack++;
+      if (currentTrack >= audioTracks.length) {
+        currentTrack = 0;
+      }
+      playTrack(currentTrack);
+    });
+
+    window.onload = () => playTrack(currentTrack);
+  </script>
+</body>
+</html>
