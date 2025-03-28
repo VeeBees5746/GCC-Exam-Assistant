@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MHSA Full TOC</title>
   <style>
     body {
@@ -56,6 +57,7 @@
   </style>
 </head>
 <body>
+
   <h2>MINE HEALTH AND SAFETY ACT 29 OF 1996 – TABLE OF CONTENTS</h2>
 
   <div id="startContainer">
@@ -207,7 +209,6 @@
   { "text": "Schedule 8 Maximum Fines or Period of Imprisonment That Can Be Imposed for Offences", "audio": "https://static.wixstatic.com/mp3/32bb59_a96b103ea0fb45a6ab91c59c976cd909.mp3" }
 ];
 
-
     const tocContainer = document.getElementById('toc');
     const player = document.getElementById('player');
     const startContainer = document.getElementById('startContainer');
@@ -217,12 +218,14 @@
 
     let currentTrack = 0;
     let wakeLock = null;
+    let isUserScrolling = false;
+    let scrollTimeout = null;
 
     tocData.forEach((entry, i) => {
       const div = document.createElement('div');
       div.className = 'line';
       div.id = `line${i}`;
-      div.innerHTML = entry.text;
+      div.textContent = entry.text;
       tocContainer.appendChild(div);
     });
 
@@ -238,7 +241,9 @@
       lines.forEach((line, i) => {
         line.classList.toggle('active', i === index);
         if (i === index) {
-          line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (!isUserScrolling) {
+            line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
           moveControls(i);
         }
       });
@@ -297,6 +302,15 @@
       playTrack(currentTrack);
       requestWakeLock();
     }
+
+    // Handle user scroll detection
+    window.addEventListener('scroll', () => {
+      isUserScrolling = true;
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isUserScrolling = false;
+      }, 5000); // Resume auto-scroll after 5s of no scroll
+    });
   </script>
 </body>
 </html>
