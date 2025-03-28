@@ -22,19 +22,17 @@
       border-left: 4px solid #d60000;
       font-weight: bold;
     }
-    .controls {
-      margin-top: 30px;
+    .floating-controls {
       display: flex;
-      gap: 12px;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 8px;
     }
-    button {
-      background-color: #0073ea;
-      color: white;
-      padding: 10px 16px;
+    .floating-controls button {
+      background: none;
       border: none;
-      border-radius: 5px;
+      font-size: 20px;
       cursor: pointer;
-      font-size: 16px;
     }
     #startContainer {
       text-align: center;
@@ -59,12 +57,6 @@
   </div>
 
   <div id="toc" style="display: none;"></div>
-
-  <div class="controls" id="controls" style="display: none;">
-    <button onclick="prevAudio()">⬅️ Previous</button>
-    <button id="playPauseBtn" onclick="togglePlayPause()">⏸️ Pause</button>
-    <button onclick="nextAudio()">➡️ Next</button>
-  </div>
 
   <audio id="player"></audio>
 
@@ -204,13 +196,11 @@
 
     const tocContainer = document.getElementById('toc');
     const player = document.getElementById('player');
-    const playPauseBtn = document.getElementById('playPauseBtn');
     const startContainer = document.getElementById('startContainer');
-    const controls = document.getElementById('controls');
 
     let currentTrack = 0;
+    let floatingControls = null;
 
-    // Populate TOC entries
     tocData.forEach((entry, i) => {
       const div = document.createElement('div');
       div.className = 'line';
@@ -221,11 +211,30 @@
 
     const lines = document.querySelectorAll('.line');
 
+    function insertControls(index) {
+      // Remove existing controls
+      if (floatingControls && floatingControls.parentNode) {
+        floatingControls.parentNode.removeChild(floatingControls);
+      }
+
+      // Create new control bar
+      floatingControls = document.createElement('div');
+      floatingControls.className = 'floating-controls';
+      floatingControls.innerHTML = `
+        <button onclick="prevAudio()">⬅️</button>
+        <button onclick="togglePlayPause()" id="playPauseBtn">⏸️</button>
+        <button onclick="nextAudio()">➡️</button>
+      `;
+
+      lines[index].after(floatingControls);
+    }
+
     function highlightLine(index) {
       lines.forEach((line, i) => {
         line.classList.toggle('active', i === index);
         if (i === index) {
           line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          insertControls(i);
         }
       });
     }
@@ -235,7 +244,7 @@
       player.src = tocData[index].audio;
       highlightLine(index);
       player.play();
-      playPauseBtn.innerText = '⏸️ Pause';
+      document.getElementById('playPauseBtn').innerText = '⏸️';
     }
 
     function nextAudio() {
@@ -253,10 +262,10 @@
     function togglePlayPause() {
       if (player.paused) {
         player.play();
-        playPauseBtn.innerText = '⏸️ Pause';
+        document.getElementById('playPauseBtn').innerText = '⏸️';
       } else {
         player.pause();
-        playPauseBtn.innerText = '▶️ Play';
+        document.getElementById('playPauseBtn').innerText = '▶️';
       }
     }
 
@@ -269,11 +278,9 @@
     function startListening() {
       startContainer.style.display = 'none';
       tocContainer.style.display = 'block';
-      controls.style.display = 'flex';
       playTrack(currentTrack);
     }
   </script>
 </body>
 </html>
-
 
