@@ -35,17 +35,35 @@
       cursor: pointer;
       font-size: 16px;
     }
+    #startContainer {
+      text-align: center;
+      margin-top: 50px;
+    }
+    #startBtn {
+      padding: 14px 24px;
+      font-size: 18px;
+      background-color: #0073ea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h2>MINE HEALTH AND SAFETY ACT 29 OF 1996 – TOC: CHAPTER 1</h2>
-  <div id="toc">
+
+  <div id="startContainer">
+    <button id="startBtn" onclick="startListening()">▶️ Start Listening</button>
+  </div>
+
+  <div id="toc" style="display: none;">
     <div class="line" id="line0">1. MINE HEALTH AND SAFETY ACT 29 OF 1996</div>
     <div class="line" id="line1">CHAPTER 1 – OBJECTS OF ACT</div>
     <div class="line" id="line2">1. Objects of Act</div>
   </div>
 
-  <div class="controls">
+  <div class="controls" id="controls" style="display: none;">
     <button onclick="prevAudio()">⬅️ Previous</button>
     <button id="playPauseBtn" onclick="togglePlayPause()">⏸️ Pause</button>
     <button onclick="nextAudio()">➡️ Next</button>
@@ -57,6 +75,9 @@
     const lines = document.querySelectorAll('.line');
     const player = document.getElementById('player');
     const playPauseBtn = document.getElementById('playPauseBtn');
+    const toc = document.getElementById('toc');
+    const controls = document.getElementById('controls');
+    const startContainer = document.getElementById('startContainer');
 
     const audioTracks = [
       "https://static.wixstatic.com/mp3/32bb59_f8f2ababd88f491aa6049db43f28d2f8.mp3",
@@ -86,7 +107,7 @@
     function nextAudio() {
       currentTrack++;
       if (currentTrack >= audioTracks.length) {
-        currentTrack = 0; // restart if at end
+        currentTrack = 0;
       }
       playTrack(currentTrack);
     }
@@ -117,7 +138,12 @@
       playTrack(currentTrack);
     });
 
-    window.onload = () => playTrack(currentTrack);
+    function startListening() {
+      startContainer.style.display = 'none';
+      toc.style.display = 'block';
+      controls.style.display = 'flex';
+      playTrack(currentTrack);
+    }
   </script>
 </body>
 </html>
